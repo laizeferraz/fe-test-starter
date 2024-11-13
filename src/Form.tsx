@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Controller, SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Image, Box, Button, Container, FormControl, FormErrorMessage, FormLabel, HStack, Input, InputGroup, InputLeftAddon, NumberInput, NumberInputField, Radio, RadioGroup, Center, useColorModeValue, useColorMode } from "@chakra-ui/react"
