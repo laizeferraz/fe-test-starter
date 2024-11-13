@@ -9,8 +9,11 @@ type FormData = z.infer<typeof formSchema>;
 
 export const Form = () => {
   const { colorMode, toggleColorMode } = useColorMode();
-  const { handleSubmit, register, formState: { errors, isSubmitting }, control } = useForm<FormData>({
+
+  const { handleSubmit, register, formState: { errors, isSubmitting }, control, reset } = useForm<FormData>({
     resolver: zodResolver(formSchema), defaultValues: {
+      name: '',
+      email: '',
       price: {
         type: 'range',
         amount: {
@@ -21,11 +24,10 @@ export const Form = () => {
     },
   })
 
-
-
   // The callback to use when the form is submitted
   const onSubmit: SubmitHandler<FormData> = async (data) => {
     await new Promise((resolve) => setTimeout(resolve, 1000));
+    reset();
     console.log(data)
   }
 
@@ -85,6 +87,7 @@ export const Form = () => {
               )}
             />
           </FormControl>
+          {/* Fixed Price Field */}
           {priceType === 'fixed' && (
             <FormControl isInvalid={!!errors.price?.amount} mb={4}>
               <FormLabel>Fixed Price</FormLabel>
@@ -95,8 +98,8 @@ export const Form = () => {
                   control={control}
                   render={({ field }) => (
                     <NumberInput min={0}
-                      onChange={(valueString) => field.onChange(Number(valueString))}>
-                      <NumberInputField data-testid="fixed-amount" placeholder="Enter fixed price" />
+                      onChange={(valueString) => field.onChange(parseFloat(valueString))}>
+                      <NumberInputField data-testid="fixed-amount" placeholder="Enter fixed price" borderLeftRadius={0} />
                     </NumberInput>
                   )}
                 />
@@ -109,7 +112,7 @@ export const Form = () => {
           {priceType === 'range' && (
             <HStack spacing={4} mb={4}>
               {/* Min Price Field */}
-              <FormControl isInvalid={!!errors.price?.amount} flex="1">
+              <FormControl isInvalid={!!errors.price?.amount && !!(errors.price.amount as any).min} flex="1">
                 <FormLabel>Min Price</FormLabel>
                 <InputGroup>
                   <InputLeftAddon>$</InputLeftAddon>
@@ -118,17 +121,17 @@ export const Form = () => {
                     control={control}
                     render={({ field }) => (
                       <NumberInput min={0}
-                        onChange={(valueString) => field.onChange(Number(valueString))}>
-                        <NumberInputField data-testid="min-amount" placeholder="Enter min price" />
+                        value={field.value || ''} onChange={(valueString) => field.onChange(parseFloat(valueString))}>
+                        <NumberInputField data-testid="min-amount" placeholder="Enter min price" borderLeftRadius={0} />
                       </NumberInput>
                     )}
                   />
                 </InputGroup>
-                <FormErrorMessage>{!!errors.price?.amount}</FormErrorMessage>
+                <FormErrorMessage>{(errors.price?.amount as any)?.min?.message}</FormErrorMessage>
               </FormControl>
 
               {/* Max Price Field */}
-              <FormControl isInvalid={!!errors.price?.amount} flex="1">
+              <FormControl isInvalid={!!errors.price?.amount && !!(errors.price.amount as any).max} flex="1">
                 <FormLabel>Max Price</FormLabel>
                 <InputGroup>
                   <InputLeftAddon>$</InputLeftAddon>
@@ -137,13 +140,13 @@ export const Form = () => {
                     control={control}
                     render={({ field }) => (
                       <NumberInput min={1}
-                        onChange={(valueString) => field.onChange(Number(valueString))} >
-                        <NumberInputField data-testid="max-amount" placeholder="Enter max price" />
+                        value={field.value || ''} onChange={(valueString) => field.onChange(Number(valueString))} >
+                        <NumberInputField data-testid="max-amount" placeholder="Enter max price" borderLeftRadius={0} />
                       </NumberInput>
                     )}
                   />
                 </InputGroup>
-                <FormErrorMessage>{errors.price?.amount?.message}</FormErrorMessage>
+                <FormErrorMessage>{(errors.price?.amount as any)?.max?.message}</FormErrorMessage>
               </FormControl>
             </HStack>
           )}

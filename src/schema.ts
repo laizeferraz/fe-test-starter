@@ -14,20 +14,20 @@ const priceSchema = z.discriminatedUnion('type', [
     type: z.literal('fixed'),
     amount: z.number({
       invalid_type_error: 'Expected number, received string'
-    }).min(0, 'Expected number, received string')
+    }).min(1, 'Expected number, received nan'),
   }),
   z.object({
     type: z.literal('range'),
     amount: z.object({
       min: z.number({
         invalid_type_error: 'Expected number, received string'
-      }).min(0, 'Expected number, received string'),
+      }).min(1, 'Expected number, received nan'),
       max: z.number({
         invalid_type_error: 'Expected number, received string'
-      }).min(1, 'Expected number, received string'),
+      }).min(1, 'Expected number, received nan'),
     }).refine(data => data.min < data.max, {
       message: 'Min must be less than max',
-      path: ['amount', 'min'],
+      path: ['min'],
     }),
   }),
 ]).optional()
